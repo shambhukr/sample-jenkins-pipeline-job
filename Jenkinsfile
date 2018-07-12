@@ -1,5 +1,6 @@
 node ('master'){
    // Mark the code checkout 'stage'....
+
    stage ('Checkout'){
    checkout scm
    }
@@ -15,10 +16,11 @@ node ('master'){
 
    def image = docker.build('infinityworks/dropwizard-example:snapshot', '.')
    }
-   stage ('Acceptance Tests')
+   stage ('Acceptance Tests'){
    image.withRun('-p 8181:8080') {c ->
         sh "${mvnHome}/bin/mvn verify"
    }
+   
 
    /* Archive acceptance tests results */
    step([$class: 'JUnitResultArchiver', testResults: '**/target/failsafe-reports/TEST-*.xml'])
@@ -36,6 +38,6 @@ stage ('Push image'){
       image.tag("latest", false)
       image.push()
    }
-   }
-
+ }
 }
+
